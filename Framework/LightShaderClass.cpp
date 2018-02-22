@@ -90,6 +90,12 @@ bool LightShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 		return false;
 	}
 
+	if (FAILED(_device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(),
+		NULL, &m_vertexShader)))
+	{
+		return false;
+	}
+
 	if (FAILED(_device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(),
 		NULL, &m_pixelShader)))
 	{
