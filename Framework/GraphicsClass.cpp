@@ -35,7 +35,7 @@ bool GraphicsClass::Init(int _screenWidth, int _screenHeight, HWND _hWnd)
 		return false;
 	}
 
-	CameraClass::GetInstance()->SetPosition(0.f, 0.f, -5.0f);
+	CameraClass::GetInstance()->SetPosition(0.f, 0.f, -10.0f);
 
 	m_Model = new ModelClass;
 	if (!m_Model)
@@ -43,34 +43,11 @@ bool GraphicsClass::Init(int _screenWidth, int _screenHeight, HWND _hWnd)
 		return false;
 	}
 
-	if (!m_Model->Init(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), "../Texture/stone01.tga"))
+	if (!m_Model->Init(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), "../Model/Cube.txt", "../Texture/stone01.tga"))
 	{
 		MessageBox(_hWnd, L"Could not initialize the model object", L"Error", MB_OK);
 		return false;
 	}
-
-	//m_ColorShader = new ColorShaderClass;
-	//if (!m_ColorShader)
-	//{
-		//return false;
-	//}
-
-	//if (!m_ColorShader->Init(m_Direct3D->GetDevice(), _hWnd))
-	//{
-		//MessageBox(_hWnd, L"Could not initialize the color shader object", L"Error", MB_OK);
-		//return false;
-	//}
-
-	/*m_TextureShader = new TextureShaderClass;
-	if (!m_TextureShader)
-	{
-		return false;
-	}
-
-	if (!m_TextureShader->Init(m_Direct3D->GetDevice(), _hWnd))
-	{
-		MessageBox(_hWnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
-	}*/
 
 	m_LightShader = new LightShaderClass;
 	if (!m_LightShader)
@@ -89,7 +66,7 @@ bool GraphicsClass::Init(int _screenWidth, int _screenHeight, HWND _hWnd)
 		return false;
 	}
 
-	m_Light->SetDiffuseColor(1.0f, 0.0f, 1.0f, 1.0f);
+	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_Light->SetDirection(0.0f, 0.0f, 1.0f);
 
 	return true;
@@ -97,18 +74,6 @@ bool GraphicsClass::Init(int _screenWidth, int _screenHeight, HWND _hWnd)
 
 void GraphicsClass::Destroy()
 {
-	/*if (m_ColorShader)
-	{
-		m_ColorShader->Destroy();
-		SAFE_DELETE(m_ColorShader);
-	}*/
-
-	/*if (m_TextureShader)
-	{
-		m_TextureShader->Destroy();
-		SAFE_DELETE(m_TextureShader);
-	}*/
-
 	SAFE_DELETE(m_Light);
 
 	if (m_LightShader)
@@ -154,17 +119,9 @@ bool GraphicsClass::Render()
 	CameraClass::GetInstance()->GetViewMatrix(viewMatrix);
 	m_Direct3D->GetProjectionMatrix(projectionMatrix);
 
+	worldMatrix = XMMatrixRotationY(-100.0f);
+
 	m_Model->Render(m_Direct3D->GetDeviceContext());
-
-	/*if (!m_ColorShader->Render(m_Direct3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
-	{
-		return false;
-	}*/
-
-	/*if (!m_TextureShader->Render(m_Direct3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model->GetTexture()))
-	{
-		return false;
-	}*/
 
 	if (!m_LightShader->Render(m_Direct3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model->GetTexture(),
 		m_Light->GetDirection(), m_Light->GetDiffuseColor()))

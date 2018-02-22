@@ -5,7 +5,8 @@
 ModelClass::ModelClass()
 	: m_vertexBuffer(NULL),
 	m_indexBuffer(NULL),
-	m_Texture(NULL)
+	m_Texture(NULL),
+	m_model(NULL)
 {
 }
 
@@ -17,14 +18,18 @@ ModelClass::~ModelClass()
 {
 }
 
-bool ModelClass::Init(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, char* _textureFilename)
+bool ModelClass::Init(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, char* _modelFilename, char* _textureFilename)
 {
+	if (!LoadModel(_modelFilename))
+	{
+		return false;
+	}
+
 	if (!InitBuffer(_device))
 	{
 		return false;
 	}
 
-	// Load the texture for this model
 	if (!LoadTexture(_device, _deviceContext, _textureFilename))
 	{
 		return false;
@@ -60,18 +65,11 @@ ID3D11ShaderResourceView* ModelClass::GetTexture()
 
 bool ModelClass::InitBuffer(ID3D11Device* _device)
 {
-	//VertexType* vertices;
-	//TexVertexType* vertices;
 	TNVertexType* vertices;
 	unsigned long* indices;
 	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
 
-	m_vertexCount = 3;
-
-	m_indexCount = 3;
-
-	//vertices = new VertexType[m_vertexCount];
 	vertices = new TNVertexType[m_vertexCount];
 	if (!vertices)
 	{
@@ -84,29 +82,14 @@ bool ModelClass::InitBuffer(ID3D11Device* _device)
 		return false;
 	}
 
-	vertices[0].position = XMFLOAT3(-1.0f, -1.0f, 0.0f);  
-	vertices[0].texture = XMFLOAT2(0.0f, 1.0f);
-	vertices[0].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-#ifdef PIXEL_COLOR_BUFFER
-	vertices[0].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-#endif 
-
-	vertices[1].position = XMFLOAT3(0.0f, 1.0f, 0.0f);  
-	vertices[1].texture = XMFLOAT2(0.5f, 0.0f);
-	vertices[1].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-#ifdef PIXEL_COLOR_BUFFER
-	vertices[1].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-#endif
-	vertices[2].position = XMFLOAT3(1.0f, -1.0f, 0.0f);  
-	vertices[2].texture = XMFLOAT2(1.0f, 1.0f);
-	vertices[2].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-#ifdef PIXEL_COLOR_BUFFER
-	vertices[2].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-#endif
-
-	indices[0] = 0;  
-	indices[1] = 1;  
-	indices[2] = 2;  
+	for (int i = 0; i<m_vertexCount; i++) 
+	{ 
+		vertices[i].position = XMFLOAT3(m_model[i].x, m_model[i].y, m_model[i].z); 
+		vertices[i].texture = XMFLOAT2(m_model[i].tu, m_model[i].tv); 
+		vertices[i].normal = XMFLOAT3(m_model[i].nx, m_model[i].ny, m_model[i].nz); 
+		
+		indices[i] = i; 
+	}
 
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	vertexBufferDesc.ByteWidth = sizeof(TNVertexType) * m_vertexCount;
@@ -196,6 +179,62 @@ void ModelClass::ReleaseTexture()
 		m_Texture->Destroy();
 		SAFE_DELETE(m_Texture);
 	}
+
+	return;
+}
+
+bool ModelClass::LoadModel(char* filename)
+{
+	ifstream fin;
+	char input;
+	int i;
+
+	fin.open(filename);
+
+	if (fin.fail())
+	{
+		return false;
+	}
+
+	fin.get(input);
+	while (input != ':')
+	{
+		fin.get(input);
+	}
+
+	fin >> m_vertexCount;
+
+	m_indexCount = m_vertexCount;
+
+	m_model = new ModelType[m_vertexCount];
+	if (!m_model)
+	{
+		return false;
+	}
+
+	fin.get(input);
+	while (input != ':')
+	{
+		fin.get(input);
+	}
+	fin.get(input);
+	fin.get(input);
+
+	for (i = 0; i<m_vertexCount; i++)
+	{
+		fin >> m_model[i].x >> m_model[i].y >> m_model[i].z;
+		fin >> m_model[i].tu >> m_model[i].tv;
+		fin >> m_model[i].nx >> m_model[i].ny >> m_model[i].nz;
+	}
+
+	fin.close();
+
+	return true;
+}
+
+void ModelClass::ReleaseModel()
+{
+	SAFE_DELETE_ARRAY(m_model);
 
 	return;
 }
