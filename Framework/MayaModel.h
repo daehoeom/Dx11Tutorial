@@ -2,6 +2,7 @@
 
 #include <ostream>
 #include <fstream>
+#include "Define.h"
 using namespace std;
 
 class MayaModel

@@ -1,5 +1,11 @@
+//Linkers
+#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
+
+
 #include "SystemClass.h"
 #include "Define.h"
+
+
 
 void DestroySingleObject()
 {
