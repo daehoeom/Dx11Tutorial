@@ -5,8 +5,6 @@
 #include "SystemClass.h"
 #include "Define.h"
 
-
-
 void DestroySingleObject()
 {
 	CameraClass::GetInstance()->DestroyInstance();

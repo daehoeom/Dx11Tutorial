@@ -51,13 +51,13 @@
     <ClCompile Include="MayaModel.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="BitmapClass.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
       <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Define.h">
-      <Filter>소스 파일</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsClass.h">
       <Filter>헤더 파일</Filter>
@@ -93,6 +93,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="MayaModel.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Define.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="BitmapClass.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

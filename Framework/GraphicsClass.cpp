@@ -8,8 +8,10 @@ GraphicsClass::GraphicsClass()
 	//m_ColorShader(NULL)
 	//m_TextureShader(NULL)
 	m_LightShader(NULL),
-	m_Light(NULL)
+	m_Light(NULL),
+	m_Maya(NULL)
 {
+	ZeroMemory(m_fileName, 256);
 }
 
 GraphicsClass::GraphicsClass(const GraphicsClass& arg)
@@ -36,6 +38,25 @@ bool GraphicsClass::Init(int _screenWidth, int _screenHeight, HWND _hWnd)
 	}
 
 	CameraClass::GetInstance()->SetPosition(0.f, 0.f, -10.0f);
+
+	m_Maya = new MayaModel;
+	if (!m_Maya)
+	{
+		return false;
+	}
+
+	strcpy_s(m_fileName, "../Model/cube.obj");
+	m_Maya->GetModelFilename(m_fileName);
+
+	if (!m_Maya->ReadFileCounts())
+	{
+		return false;
+	}
+
+	if (!m_Maya->LoadDataStructures())
+	{
+		return false;
+	}
 
 	m_Model = new ModelClass;
 	if (!m_Model)
@@ -65,9 +86,12 @@ bool GraphicsClass::Init(int _screenWidth, int _screenHeight, HWND _hWnd)
 	{
 		return false;
 	}
-
+	
+	m_Light->SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f);
 	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_Light->SetDirection(0.0f, 0.0f, 1.0f);
+	m_Light->SetDirection(1.0f, 0.0f, 0.0f);
+	m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
+	m_Light->SetSpecularPower(32.0f);
 
 	return true;
 }
@@ -99,7 +123,16 @@ void GraphicsClass::Destroy()
 
 bool GraphicsClass::Frame()
 {
-	if (!Render())
+	static float rotation = 0.0f;
+
+	rotation += (float)XM_PI * 0.005f;
+
+	if (rotation > 360.0f)
+	{
+		rotation -= 360.0f;
+	}
+
+	if (!Render(rotation))
 	{
 		return false;
 	}
@@ -107,7 +140,7 @@ bool GraphicsClass::Frame()
 	return true;
 }
 
-bool GraphicsClass::Render()
+bool GraphicsClass::Render(float _rotation)
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 
@@ -119,12 +152,13 @@ bool GraphicsClass::Render()
 	CameraClass::GetInstance()->GetViewMatrix(viewMatrix);
 	m_Direct3D->GetProjectionMatrix(projectionMatrix);
 
-	worldMatrix = XMMatrixRotationY(-100.0f);
+	worldMatrix = XMMatrixScaling(3.0f, 3.0f, 3.0f) * XMMatrixRotationY(_rotation);
 
 	m_Model->Render(m_Direct3D->GetDeviceContext());
 
 	if (!m_LightShader->Render(m_Direct3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, m_Model->GetTexture(),
-		m_Light->GetDirection(), m_Light->GetDiffuseColor()))
+		m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), CameraClass::GetInstance()->GetPosition(),
+		m_Light->GetSpecularColor(), m_Light->GetSpecularPower()))
 	{
 		return false;
 	}

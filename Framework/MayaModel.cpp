@@ -16,18 +16,31 @@ MayaModel::~MayaModel()
 
 void MayaModel::GetModelFilename(char* _filename)
 {
+	ifstream fin;
+	
+	fin.open(_filename);
+
+	if (fin.good())
+	{
+		strcpy_s(m_fileName, _filename);
+		return;
+	}
+	else
+	{
+		cout << "File could not be opened" << endl;
+	}
+
 	return;
 }
 
-bool MayaModel::ReadFileCounts(char* _filename, int& _vertexCount, int& _textureCount, 
-	int& _normalCount, int& _faceCount)
+bool MayaModel::ReadFileCounts()
 {
 	ifstream fin;
 	char input = '\0';
 
-	_vertexCount = _textureCount = _normalCount = _faceCount = 0;
+	m_vertexCount = m_textureCount = m_normalCount = m_faceCount = 0;
 
-	fin.open(_filename);
+	fin.open(m_fileName);
 
 	if (fin.fail())
 	{
@@ -40,15 +53,15 @@ bool MayaModel::ReadFileCounts(char* _filename, int& _vertexCount, int& _texture
 		if (input == 'v')
 		{
 			fin.get(input);
-			if (input == ' ') { _vertexCount++; }
-			if (input == 't') { _textureCount++; }
-			if (input == 'n') { _normalCount++; }
+			if (input == ' ') { m_vertexCount++; }
+			if (input == 't') { m_textureCount++; }
+			if (input == 'n') { m_normalCount++; }
 		}
 		
 		if (input == 'f')
 		{
 			fin.get(input);
-			if (input == ' ') { _faceCount++; }
+			if (input == ' ') { m_faceCount++; }
 		}
 
 		while (input != '\n')
@@ -64,8 +77,7 @@ bool MayaModel::ReadFileCounts(char* _filename, int& _vertexCount, int& _texture
 	return true;
 }
 
-bool MayaModel::LoadDataStructures(char* _filename, int _vertexCount, int _textureCount, 
-	int _normalCount, int _faceCount)
+bool MayaModel::LoadDataStructures()
 {
 	VertexType* vertices;
 	VertexType* texcoord;
@@ -83,25 +95,25 @@ bool MayaModel::LoadDataStructures(char* _filename, int _vertexCount, int _textu
 	ofstream fout;
 
 	// 구조체 4개의 데이터를 초기화 한다.
-	vertices = new VertexType[_vertexCount];
+	vertices = new VertexType[m_vertexCount];
 	if (!vertices)
 	{
 		return false;
 	}
 
-	texcoord = new VertexType[_textureCount];
+	texcoord = new VertexType[m_textureCount];
 	if (!texcoord)
 	{
 		return false;
 	}
 
-	normals = new VertexType[_normalCount];
+	normals = new VertexType[m_normalCount];
 	if (!normals)
 	{
 		return false;
 	}
 
-	faces = new FaceType[_faceCount];
+	faces = new FaceType[m_faceCount];
 	if (!faces)
 	{
 		return false;
@@ -110,7 +122,7 @@ bool MayaModel::LoadDataStructures(char* _filename, int _vertexCount, int _textu
 	vertexIndex = texcoordIndex = normalIndex = faceIndex = 0;
 
 	// Maya(.obj)파일 열기
-	fin.open(_filename);
+	fin.open(m_fileName);
 
 	if (fin.fail())
 	{
@@ -182,9 +194,9 @@ bool MayaModel::LoadDataStructures(char* _filename, int _vertexCount, int _textu
 
 	fin.close();
 
-	fout.open("model.txt");
+	fout.open("../Model/cube.txt");
 
-	fout << "Vertex Count : " << (_faceCount * 3) << endl;
+	fout << "Vertex Count : " << (m_faceCount * 3) << endl;
 	fout << endl;
 	fout << "Data : " << endl;
 	fout << endl;
@@ -222,4 +234,6 @@ bool MayaModel::LoadDataStructures(char* _filename, int _vertexCount, int _textu
 	SAFE_DELETE_ARRAY(texcoord);
 	SAFE_DELETE_ARRAY(normals);
 	SAFE_DELETE_ARRAY(faces);
+
+	return true;
 }

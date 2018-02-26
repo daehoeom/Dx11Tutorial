@@ -22,10 +22,18 @@ private:
 
 	typedef struct
 	{
+		XMFLOAT4 ambient;
 		XMFLOAT4 diffuseColor;
 		XMFLOAT3 lightDirection;
-		float padding;
+		float specularPower;
+		XMFLOAT4 specularColor;
 	}LightBufferType;
+
+	typedef struct
+	{
+		XMFLOAT3 cameraPosition;
+		float padding;
+	}CameraBufferType;
 
 public:
 	LightShaderClass();
@@ -35,14 +43,16 @@ public:
 public:
 	bool Init(ID3D11Device*, HWND);
 	void Destroy();
-	bool Render(ID3D11DeviceContext*, int, XMMATRIX&, XMMATRIX&, XMMATRIX&, ID3D11ShaderResourceView*, XMFLOAT3, XMFLOAT4);
+	bool Render(ID3D11DeviceContext*, int, XMMATRIX&, XMMATRIX&, XMMATRIX&, ID3D11ShaderResourceView*, XMFLOAT3, XMFLOAT4, XMFLOAT4,
+		XMFLOAT3, XMFLOAT4, float);
 	
 private:
 	bool InitShader(ID3D11Device*, HWND, WCHAR*, WCHAR*);
 	void DestroyShader();
 	void OutputShadererrorMessage(ID3D10Blob*, HWND, WCHAR*);
 
-	bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX&, XMMATRIX&, XMMATRIX&, ID3D11ShaderResourceView*, XMFLOAT3, XMFLOAT4);
+	bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX&, XMMATRIX&, XMMATRIX&, ID3D11ShaderResourceView*, XMFLOAT3, XMFLOAT4, XMFLOAT4,
+		XMFLOAT3, XMFLOAT4, float);
 	void RenderShader(ID3D11DeviceContext*, int);
 
 private:
@@ -51,6 +61,7 @@ private:
 	ID3D11InputLayout* m_layout;
 	ID3D11SamplerState* m_sampleState;
 	ID3D11Buffer* m_matrixBuffer;
+	ID3D11Buffer* m_cameraBuffer;
 	ID3D11Buffer* m_lightBuffer;
 };
 

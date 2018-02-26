@@ -7,7 +7,7 @@
 #include "TextureShaderClass.h"
 #include "LightClass.h"
 #include "LightShaderClass.h"
-
+#include "MayaModel.h"
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
 
@@ -24,13 +24,15 @@ public:
 	bool Frame();
 
 private:
-	bool Render();
+	bool Render(float);
 
 private:
 	D3DClass* m_Direct3D;
 	ModelClass* m_Model;
 	LightShaderClass* m_LightShader;
 	LightClass* m_Light;
+	MayaModel* m_Maya;
+	char m_fileName[256];
 	//TextureShaderClass* m_TextureShader;
 	//ColorShaderClass* m_ColorShader;
 };

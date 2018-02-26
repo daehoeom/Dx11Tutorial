@@ -2,6 +2,7 @@
 
 #include <ostream>
 #include <fstream>
+#include <iostream>
 #include "Define.h"
 using namespace std;
 
@@ -26,7 +27,14 @@ public:
 	~MayaModel();
 
 	void GetModelFilename(char*);
-	bool ReadFileCounts(char*, int&, int&, int&, int&);
-	bool LoadDataStructures(char*, int, int, int, int);
+	bool ReadFileCounts();
+	bool LoadDataStructures();
+
+private:
+	char m_fileName[256];
+	int m_vertexCount;
+	int m_textureCount;
+	int m_normalCount;
+	int m_faceCount;
 };
 
