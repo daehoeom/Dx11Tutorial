@@ -26,6 +26,7 @@ D3DClass::~D3DClass()
 bool D3DClass::Init(int _screenWidth, int _screenHeight, bool _vsync, HWND _hWnd, bool _fullscreen,
 	float _screenDepth, float _screenNear)
 {
+	HRESULT result;
 	IDXGIFactory* factory;
 	IDXGIAdapter* adapter;
 	IDXGIOutput* adapterOutput;
@@ -47,8 +48,10 @@ bool D3DClass::Init(int _screenWidth, int _screenHeight, bool _vsync, HWND _hWnd
 
 	m_vsync_enabled = _vsync;
 
-	if (FAILED(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory)))
+	result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory)));
+	if (FAILED(result))
 	{
+		fprintf(stderr,"%d", result.ErrorMessage());
 		return false;
 	}
 
