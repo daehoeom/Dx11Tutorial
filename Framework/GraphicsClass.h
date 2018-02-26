@@ -8,6 +8,8 @@
 #include "LightClass.h"
 #include "LightShaderClass.h"
 #include "MayaModel.h"
+#include "BitmapClass.h"
+
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
 
@@ -32,8 +34,9 @@ private:
 	LightShaderClass* m_LightShader;
 	LightClass* m_Light;
 	MayaModel* m_Maya;
+	BitmapClass* m_Bitmap;
 	char m_fileName[256];
-	//TextureShaderClass* m_TextureShader;
+	TextureShaderClass* m_TextureShader;
 	//ColorShaderClass* m_ColorShader;
 };
 

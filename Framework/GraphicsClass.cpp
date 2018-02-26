@@ -6,10 +6,11 @@ GraphicsClass::GraphicsClass()
 	: m_Direct3D(NULL),
 	m_Model(NULL),
 	//m_ColorShader(NULL)
-	//m_TextureShader(NULL)
+	m_TextureShader(NULL),
 	m_LightShader(NULL),
 	m_Light(NULL),
-	m_Maya(NULL)
+	m_Maya(NULL),
+	m_Bitmap(NULL)
 {
 	ZeroMemory(m_fileName, 256);
 }
@@ -86,7 +87,7 @@ bool GraphicsClass::Init(int _screenWidth, int _screenHeight, HWND _hWnd)
 	{
 		return false;
 	}
-	
+
 	m_Light->SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f);
 	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_Light->SetDirection(1.0f, 0.0f, 0.0f);
