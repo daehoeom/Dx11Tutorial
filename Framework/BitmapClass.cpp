@@ -75,6 +75,7 @@ ID3D11ShaderResourceView* BitmapClass::GetTexture()
 
 bool BitmapClass::InitBuffers(ID3D11Device* _device)
 {
+	HRESULT result;
 	VertexType* vertices;
 	unsigned long* indices;
 	D3D11_BUFFER_DESC vertexBufferDesc;
@@ -118,8 +119,10 @@ bool BitmapClass::InitBuffers(ID3D11Device* _device)
 	vertexData.SysMemPitch = 0;
 	vertexData.SysMemSlicePitch = 0;
 
-	if (FAILED(_device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer)))
+	result = _device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
@@ -134,21 +137,22 @@ bool BitmapClass::InitBuffers(ID3D11Device* _device)
 	indexData.SysMemPitch = 0;
 	indexData.SysMemSlicePitch = 0;
 
-	if (FAILED(_device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer)))
+	result = _device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
+	if (FAILED(result))
 	{
 		return false;
 	}
 
-	SAFE_DELETE_ARRAY(vertices);
-	SAFE_DELETE_ARRAY(indices);
+	safe_delete_array(vertices);
+	safe_delete_array(indices);
 
 	return true;
 }
 
 void BitmapClass::DestroyBuffers()
 {
-	SAFE_RELEASE(m_indexBuffer);
-	SAFE_RELEASE(m_vertexBuffer);
+	safe_release(m_indexBuffer);
+	safe_release(m_vertexBuffer);
 
 	return;
 }
@@ -172,6 +176,7 @@ bool BitmapClass::UpdateBuffers(ID3D11DeviceContext* _deviceContext, int _positi
 	right = left + (float)m_bitmapWidth;
 
 	top = (float)(m_screenHeight / 2) - (float)_positionY;
+	bottom = top - (float)m_bitmapHeight;
 
 	vertices = new VertexType[m_vertexCount];
 	if (!vertices)
@@ -197,18 +202,20 @@ bool BitmapClass::UpdateBuffers(ID3D11DeviceContext* _deviceContext, int _positi
 	vertices[5].position = XMFLOAT3(right, bottom, 0.0f);
 	vertices[5].texture = XMFLOAT2(1.0f, 1.0f);
 
-	if (FAILED(_deviceContext->Map(m_vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+	result = _deviceContext->Map(m_vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
-	verticesPtr - (VertexType*)mappedResource.pData;
+	verticesPtr = (VertexType*)mappedResource.pData;
 
 	memcpy(verticesPtr, (void*)vertices, (sizeof(VertexType) * m_vertexCount));
 
 	_deviceContext->Unmap(m_vertexBuffer, 0);
 
-	SAFE_DELETE_ARRAY(vertices);
+	safe_delete_array(vertices);
 
 	return true;
 }
@@ -238,15 +245,16 @@ bool BitmapClass::LoadTexture(ID3D11Device* _device, WCHAR* _filename)
 		return false;
 	}
 
-	if (!m_Texture->Init(_device, _filename))
+	/*if (!m_Texture->Init(_device, _filename))
 	{
 		return false;
-	}
+	}*/
+	return true;
 }
 
 void BitmapClass::ReleaseTexture()
 {
-	SAFE_DELETE_DESTROY(m_Texture);
+	safe_delete_destroy(m_Texture);
 
 	return;
 }

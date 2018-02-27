@@ -69,11 +69,7 @@ void SystemClass::Update()
 
 void SystemClass::Destroy()
 {
-	if (m_pGraphics)
-	{
-		m_pGraphics->Destroy();
-		SAFE_DELETE(m_pGraphics);
-	}
+	safe_delete_destroy(m_pGraphics);
 
 	ShutdownWindows();
 

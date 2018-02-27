@@ -50,6 +50,7 @@ bool ColorShaderClass::Render(ID3D11DeviceContext* _deviceContext, int _indexCou
 
 bool ColorShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsFilename, WCHAR* _psFilename)
 {
+	HRESULT result;
 	ID3D10Blob* errorMessage = NULL;
 	ID3D10Blob* vertexShaderBuffer = NULL;
 	ID3D10Blob* pixelShaderBuffer = NULL;
@@ -57,8 +58,9 @@ bool ColorShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 	unsigned int numElements;
 	D3D11_BUFFER_DESC matrixBufferDesc;
 
-	if (FAILED(D3DCompileFromFile(_vsFilename, NULL, NULL, "ColorVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
-		&vertexShaderBuffer, &errorMessage)))
+	result = D3DCompileFromFile(_vsFilename, NULL, NULL, "ColorVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
+		&vertexShaderBuffer, &errorMessage)
+	if (FAILED(result))
 	{
 		if (errorMessage)
 		{
@@ -72,8 +74,9 @@ bool ColorShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 		return false;
 	}
 
-	if (FAILED(D3DCompileFromFile(_psFilename, NULL, NULL, "ColorPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
-		&pixelShaderBuffer, &errorMessage)))
+	result = D3DCompileFromFile(_psFilename, NULL, NULL, "ColorPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
+		&pixelShaderBuffer, &errorMessage);
+	if (FAILED(result))
 	{
 		if (errorMessage)
 		{
@@ -87,12 +90,14 @@ bool ColorShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 		return false;
 	}
 
-	if (FAILED(_device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &m_vertexShader)))
+	result = _device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &m_vertexShader);
+	if (FAILED(result))
 	{
 		return false;
 	}
 
-	if (FAILED(_device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &m_pixelShader)))
+	result = _device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &m_pixelShader);
+	if (FAILED(result))
 	{
 		return false;
 	}
@@ -115,14 +120,15 @@ bool ColorShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 
 	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
 
-	if (FAILED(_device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(),
-		vertexShaderBuffer->GetBufferSize(), &m_layout)))
+	result = _device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(),
+		vertexShaderBuffer->GetBufferSize(), &m_layout);
+	if (FAILED(result))
 	{
 		return false;
 	}
 
-	SAFE_RELEASE(vertexShaderBuffer);
-	SAFE_RELEASE(pixelShaderBuffer);
+	safe_release(vertexShaderBuffer);
+	safe_release(pixelShaderBuffer);
 
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
@@ -131,7 +137,8 @@ bool ColorShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 	matrixBufferDesc.MiscFlags = 0;
 	matrixBufferDesc.StructureByteStride = 0;
 
-	if (FAILED(_device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer)))
+	result = _device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
+	if (FAILED(result))
 	{
 		return false;
 	}
@@ -141,10 +148,10 @@ bool ColorShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 
 void ColorShaderClass::DestroyShader()
 {
-	SAFE_RELEASE(m_matrixBuffer);
-	SAFE_RELEASE(m_layout);
-	SAFE_RELEASE(m_pixelShader);
-	SAFE_RELEASE(m_vertexShader);
+	safe_release(m_matrixBuffer);
+	safe_release(m_layout);
+	safe_release(m_pixelShader);
+	safe_release(m_vertexShader);
 
 	return;
 }
@@ -158,7 +165,7 @@ void ColorShaderClass::OutputShaderErrorMessage(ID3D10Blob* _errorMessage, HWND 
 
 	bufferSize = _errorMessage->GetBufferSize();
 
-	SAFE_RELEASE(_errorMessage);
+	safe_release(_errorMessage);
 
 	MessageBox(_hWnd, L"Error compiling shader", _shaderFilename, MB_OK);
 
@@ -168,6 +175,7 @@ void ColorShaderClass::OutputShaderErrorMessage(ID3D10Blob* _errorMessage, HWND 
 bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* _deviceContext, XMMATRIX& _worldMatrix, XMMATRIX& _viewMatrix,
 	XMMATRIX& _projectionMatrix)
 {
+	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
 	unsigned int bufferNumber;
@@ -176,7 +184,8 @@ bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* _deviceContext, 
 	_viewMatrix = XMMatrixTranspose(_viewMatrix);
 	_projectionMatrix = XMMatrixTranspose(_projectionMatrix);
 
-	if (FAILED(_deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+	result = _deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
 	{
 		return false;
 	}

@@ -230,10 +230,10 @@ bool MayaModel::LoadDataStructures()
 
 	fout.close();
 
-	SAFE_DELETE_ARRAY(vertices);
-	SAFE_DELETE_ARRAY(texcoord);
-	SAFE_DELETE_ARRAY(normals);
-	SAFE_DELETE_ARRAY(faces);
+	safe_delete_array(vertices);
+	safe_delete_array(texcoord);
+	safe_delete_array(normals);
+	safe_delete_array(faces);
 
 	return true;
 }

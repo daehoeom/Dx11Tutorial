@@ -23,8 +23,7 @@ int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, PSTR _pScmdli
 		pSystem->Update();
 	}
 
-	pSystem->Destroy();
-	SAFE_DELETE(pSystem);
+	safe_delete_destroy(pSystem);
 	DestroySingleObject();
 
 	return 0;

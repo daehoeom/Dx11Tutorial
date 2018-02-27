@@ -48,25 +48,31 @@ bool D3DClass::Init(int _screenWidth, int _screenHeight, bool _vsync, HWND _hWnd
 
 	m_vsync_enabled = _vsync;
 
-	result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory)));
+	result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory);
 	if (FAILED(result))
 	{
-		fprintf(stderr,"%d", result.ErrorMessage());
+		HR(result);
 		return false;
 	}
 
-	if (FAILED(factory->EnumAdapters(0, &adapter)))
+	result = factory->EnumAdapters(0, &adapter);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
-	if (FAILED(adapter->EnumOutputs(0, &adapterOutput)))
+	result = adapter->EnumOutputs(0, &adapterOutput);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
-	if (FAILED(adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, NULL)))
+	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, NULL);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
@@ -76,8 +82,10 @@ bool D3DClass::Init(int _screenWidth, int _screenHeight, bool _vsync, HWND _hWnd
 		return false;
 	}
 
-	if (FAILED(adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, displayModeList)))
+	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, displayModeList);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
@@ -93,18 +101,19 @@ bool D3DClass::Init(int _screenWidth, int _screenHeight, bool _vsync, HWND _hWnd
 		}
 	}
 
-	if (FAILED(adapter->GetDesc(&adapterDesc)))
+	result = adapter->GetDesc(&adapterDesc);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
 	m_videoCardMemory = (int)(adapterDesc.DedicatedVideoMemory / 1024 / 1024);
 
-
-	SAFE_DELETE_ARRAY(displayModeList);
-	SAFE_RELEASE(adapterOutput);
-	SAFE_RELEASE(adapter);
-	SAFE_RELEASE(factory);
+	safe_delete_array(displayModeList);
+	safe_release(adapterOutput);
+	safe_release(adapter);
+	safe_release(factory);
 
 	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
 
@@ -143,24 +152,29 @@ bool D3DClass::Init(int _screenWidth, int _screenHeight, bool _vsync, HWND _hWnd
 
 	featureLevel = D3D_FEATURE_LEVEL_11_0;
 
-
-	if (FAILED(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, &featureLevel, 1,
-		D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, NULL, &m_deviceContext)))
+	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, &featureLevel, 1,
+		D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, NULL, &m_deviceContext);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
-	if (FAILED(m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr)))
+	result = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
-	if (FAILED(m_device->CreateRenderTargetView(backBufferPtr, NULL, &m_renderTargetView)))
+	result = m_device->CreateRenderTargetView(backBufferPtr, NULL, &m_renderTargetView);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 	
-	SAFE_RELEASE(backBufferPtr);
+	safe_release(backBufferPtr);
 
 	ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
 
@@ -176,8 +190,10 @@ bool D3DClass::Init(int _screenWidth, int _screenHeight, bool _vsync, HWND _hWnd
 	depthBufferDesc.CPUAccessFlags = 0;
 	depthBufferDesc.MiscFlags = 0;
 
-	if (FAILED(m_device->CreateTexture2D(&depthBufferDesc, NULL, &m_depthStencilBuffer)))
+	result = m_device->CreateTexture2D(&depthBufferDesc, NULL, &m_depthStencilBuffer);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
@@ -201,8 +217,10 @@ bool D3DClass::Init(int _screenWidth, int _screenHeight, bool _vsync, HWND _hWnd
 	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-	if (FAILED(m_device->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState)))
+	result = m_device->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
@@ -214,8 +232,10 @@ bool D3DClass::Init(int _screenWidth, int _screenHeight, bool _vsync, HWND _hWnd
 	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	depthStencilViewDesc.Texture2D.MipSlice = 0;
 
-	if (FAILED(m_device->CreateDepthStencilView(m_depthStencilBuffer, &depthStencilViewDesc, &m_depthStencilView)))
+	result = m_device->CreateDepthStencilView(m_depthStencilBuffer, &depthStencilViewDesc, &m_depthStencilView);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
@@ -232,8 +252,10 @@ bool D3DClass::Init(int _screenWidth, int _screenHeight, bool _vsync, HWND _hWnd
 	rasterDesc.ScissorEnable = false;
 	rasterDesc.SlopeScaledDepthBias = 0.0f;
 
-	if (FAILED(m_device->CreateRasterizerState(&rasterDesc, &m_rasterState)))
+	result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterState);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
@@ -274,8 +296,10 @@ bool D3DClass::Init(int _screenWidth, int _screenHeight, bool _vsync, HWND _hWnd
 	depthDisabledStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthDisabledStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-	if (FAILED(m_device->CreateDepthStencilState(&depthDisabledStencilDesc, &m_depthDisabledStencilState)))
+	result = m_device->CreateDepthStencilState(&depthDisabledStencilDesc, &m_depthDisabledStencilState);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
@@ -289,15 +313,15 @@ void D3DClass::Destroy()
 		m_swapChain->SetFullscreenState(false, NULL);
 	}
 
-	SAFE_RELEASE(m_depthDisabledStencilState);
-	SAFE_RELEASE(m_rasterState);
-	SAFE_RELEASE(m_depthStencilView);
-	SAFE_RELEASE(m_depthStencilState);
-	SAFE_RELEASE(m_depthStencilBuffer);
-	SAFE_RELEASE(m_renderTargetView);
-	SAFE_RELEASE(m_deviceContext);
-	SAFE_RELEASE(m_device);
-	SAFE_RELEASE(m_swapChain);
+	safe_release(m_depthDisabledStencilState);
+	safe_release(m_rasterState);
+	safe_release(m_depthStencilView);
+	safe_release(m_depthStencilState);
+	safe_release(m_depthStencilBuffer);
+	safe_release(m_renderTargetView);
+	safe_release(m_deviceContext);
+	safe_release(m_device);
+	safe_release(m_swapChain);
 
 	return;
 }

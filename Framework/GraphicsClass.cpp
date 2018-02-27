@@ -99,26 +99,11 @@ bool GraphicsClass::Init(int _screenWidth, int _screenHeight, HWND _hWnd)
 
 void GraphicsClass::Destroy()
 {
-	SAFE_DELETE(m_Light);
-
-	if (m_LightShader)
-	{
-		m_LightShader->Destroy();
-		SAFE_DELETE(m_LightShader);
-	}
-
-	if (m_Model)
-	{
-		m_Model->Destroy();
-		SAFE_DELETE(m_Model);
-	}
-
-	if (m_Direct3D)
-	{
-		m_Direct3D->Destroy();
-		SAFE_DELETE(m_Direct3D);
-	}
-
+	safe_delete(m_Light);
+	safe_delete_destroy(m_LightShader);
+	safe_delete_destroy(m_Model);
+	safe_delete_destroy(m_Direct3D);
+	
 	return;
 }
 

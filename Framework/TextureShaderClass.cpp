@@ -123,8 +123,8 @@ bool TextureShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _v
 		return false;
 	}
 
-	SAFE_RELEASE(vertexShaderBuffer);
-	SAFE_RELEASE(pixelShaderBuffer);
+	safe_release(vertexShaderBuffer);
+	safe_release(pixelShaderBuffer);
 
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
@@ -162,11 +162,11 @@ bool TextureShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _v
 
 void TextureShaderClass::DestroyShader()
 {
-	SAFE_RELEASE(m_sampleState);
-	SAFE_RELEASE(m_matrixBuffer);
-	SAFE_RELEASE(m_layout);
-	SAFE_RELEASE(m_pixelShader);
-	SAFE_RELEASE(m_vertexShader);
+	safe_release(m_sampleState);
+	safe_release(m_matrixBuffer);
+	safe_release(m_layout);
+	safe_release(m_pixelShader);
+	safe_release(m_vertexShader);
 }
 
 void TextureShaderClass::OutputShaderErrorMessage(ID3D10Blob* _errorMessage, HWND _hWnd, WCHAR* _shaderFilename)
@@ -182,7 +182,7 @@ void TextureShaderClass::OutputShaderErrorMessage(ID3D10Blob* _errorMessage, HWN
 
 	bufferSize = _errorMessage->GetBufferSize();
 
-	error = fopen_s(&fp, "shader-error.txt", "w");
+	error = fopen_s(&fp, "../ErrorLog/shader-error.txt", "w");
 
 	if (error != 0)
 	{
@@ -198,7 +198,7 @@ void TextureShaderClass::OutputShaderErrorMessage(ID3D10Blob* _errorMessage, HWN
 
 	fclose(fp);
 
-	SAFE_RELEASE(_errorMessage);
+	safe_release(_errorMessage);
 
 	MessageBox(_hWnd, L"Error compiling shader .Check shader-error.txt for message.", _shaderFilename, MB_OK);
 

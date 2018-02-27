@@ -55,6 +55,7 @@ bool LightShaderClass::Render(ID3D11DeviceContext* _deviceContext, int _indexCou
 
 bool LightShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsFilename, WCHAR* _psFilename)
 {
+	HRESULT result;
 	ID3D10Blob* errorMessage = NULL;
 	ID3D10Blob* vertexShaderBuffer = NULL;
 	ID3D10Blob* pixelShaderBuffer = NULL;
@@ -65,8 +66,9 @@ bool LightShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 	D3D11_BUFFER_DESC lightBufferDesc;
 	D3D11_BUFFER_DESC cameraBufferDesc;
 
-	if (FAILED(D3DCompileFromFile(_vsFilename, NULL, NULL, "LightVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
-		&vertexShaderBuffer, &errorMessage)))
+	result = D3DCompileFromFile(_vsFilename, NULL, NULL, "LightVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
+		&vertexShaderBuffer, &errorMessage);
+	if (FAILED(result))
 	{
 		if (errorMessage)
 		{
@@ -80,8 +82,9 @@ bool LightShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 		return false;
 	}
 
-	if (FAILED(D3DCompileFromFile(_psFilename, NULL, NULL, "LightPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
-		&pixelShaderBuffer, &errorMessage)))
+	result = D3DCompileFromFile(_psFilename, NULL, NULL, "LightPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
+		&pixelShaderBuffer, &errorMessage);
+	if (FAILED(result))
 	{
 		if (errorMessage)
 		{
@@ -94,15 +97,19 @@ bool LightShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 		return false;
 	}
 
-	if (FAILED(_device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(),
-		NULL, &m_vertexShader)))
+	result = _device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(),
+		NULL, &m_vertexShader);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
-	if (FAILED(_device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(),
-		NULL, &m_pixelShader)))
+	result = _device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(),
+		NULL, &m_pixelShader);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
@@ -132,14 +139,16 @@ bool LightShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 
 	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
 
-	if (FAILED(_device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(),
-		vertexShaderBuffer->GetBufferSize(), &m_layout)))
+	result = _device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(),
+		vertexShaderBuffer->GetBufferSize(), &m_layout);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
-	SAFE_RELEASE(vertexShaderBuffer);
-	SAFE_RELEASE(pixelShaderBuffer);
+	safe_release(vertexShaderBuffer);
+	safe_release(pixelShaderBuffer);
 
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -155,8 +164,10 @@ bool LightShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 	samplerDesc.MinLOD = 0;
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-	if (FAILED(_device->CreateSamplerState(&samplerDesc, &m_sampleState)))
+	result = _device->CreateSamplerState(&samplerDesc, &m_sampleState);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
@@ -167,8 +178,10 @@ bool LightShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 	matrixBufferDesc.MiscFlags = 0;
 	matrixBufferDesc.StructureByteStride = 0;
 
-	if (FAILED(_device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer)))
+	result = _device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
+	if (FAILED(result))
 	{
+		HR(result);
 		return false;
 	}
 
@@ -179,7 +192,8 @@ bool LightShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 	cameraBufferDesc.MiscFlags = 0;
 	cameraBufferDesc.StructureByteStride = 0;
 
-	if (FAILED(_device->CreateBuffer(&cameraBufferDesc, NULL, &m_cameraBuffer)))
+	result = _device->CreateBuffer(&cameraBufferDesc, NULL, &m_cameraBuffer);
+	if (FAILED(result))
 	{
 		return false;
 	}
@@ -201,13 +215,13 @@ bool LightShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 
 void LightShaderClass::DestroyShader()
 {
-	SAFE_RELEASE(m_lightBuffer);
-	SAFE_RELEASE(m_cameraBuffer);
-	SAFE_RELEASE(m_matrixBuffer);
-	SAFE_RELEASE(m_sampleState);
-	SAFE_RELEASE(m_layout);
-	SAFE_RELEASE(m_pixelShader);
-	SAFE_RELEASE(m_vertexShader);
+	safe_release(m_lightBuffer);
+	safe_release(m_cameraBuffer);
+	safe_release(m_matrixBuffer);
+	safe_release(m_sampleState);
+	safe_release(m_layout);
+	safe_release(m_pixelShader);
+	safe_release(m_vertexShader);
 
 	return;
 }
@@ -230,7 +244,7 @@ void LightShaderClass::OutputShadererrorMessage(ID3D10Blob* _errorMessage, HWND 
 		buffer[i] = compileErrors[i];
 	}
 
-	error = fopen_s(&fp, "shader-error.txt", "w");
+	error = fopen_s(&fp, "../ErrorLog/shader-error.txt", "w");
 	
 	if (error != 0)
 	{
@@ -241,7 +255,7 @@ void LightShaderClass::OutputShadererrorMessage(ID3D10Blob* _errorMessage, HWND 
 	
 	fclose(fp);
 
-	SAFE_RELEASE(_errorMessage);
+	safe_release(_errorMessage);
 
 	MessageBox(_hWnd, L"Error compiling shader. Check shader-error.txt for message.", _shaderFilename, MB_OK);
 	return;

@@ -62,16 +62,16 @@ bool TextureClass::Init(ID3D11Device* _device, ID3D11DeviceContext* _deviceConte
 
 	_deviceContext->GenerateMips(m_textureView);
 
-	SAFE_DELETE(m_targaData);
+	safe_delete(m_targaData);
 
 	return true;
 }
 
 void TextureClass::Destroy()
 {
-	SAFE_RELEASE(m_textureView);
-	SAFE_RELEASE(m_texture);
-	SAFE_DELETE_ARRAY(m_targaData);
+	safe_release(m_textureView);
+	safe_release(m_texture);
+	safe_delete_array(m_targaData);
 
 	return;
 }
@@ -158,7 +158,7 @@ bool TextureClass::LoadTarga(char* _filename, int& _height, int& _width)
 		k -= (_width * 8);
 	}
 
-	SAFE_DELETE_ARRAY(targaImage);
+	safe_delete_array(targaImage);
 
 	return true;
 }

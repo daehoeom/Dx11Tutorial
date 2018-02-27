@@ -123,16 +123,16 @@ bool ModelClass::InitBuffer(ID3D11Device* _device)
 		return false;
 	}
 
-	SAFE_DELETE_ARRAY(vertices);
-	SAFE_DELETE_ARRAY(indices);
+	safe_delete_array(vertices);
+	safe_delete_array(indices);
 
 	return true;
 }
 
 void ModelClass::DestroyBuffers()
 {
-	SAFE_RELEASE(m_indexBuffer);
-	SAFE_RELEASE(m_vertexBuffer);
+	safe_release(m_indexBuffer);
+	safe_release(m_vertexBuffer);
 
 	return;
 }
@@ -174,11 +174,7 @@ bool ModelClass::LoadTexture(ID3D11Device* _device, ID3D11DeviceContext* _device
 
 void ModelClass::ReleaseTexture()
 {
-	if (m_Texture)
-	{
-		m_Texture->Destroy();
-		SAFE_DELETE(m_Texture);
-	}
+	safe_delete_destroy(m_Texture);
 
 	return;
 }
@@ -234,7 +230,7 @@ bool ModelClass::LoadModel(char* filename)
 
 void ModelClass::ReleaseModel()
 {
-	SAFE_DELETE_ARRAY(m_model);
+	safe_delete_array(m_model);
 
 	return;
 }
