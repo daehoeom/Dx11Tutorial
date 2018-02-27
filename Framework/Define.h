@@ -1,8 +1,8 @@
 #pragma once
 
+#include <Windows.h>
 // singleton include list
 #include "CameraClass.h"
-//#define PIXEL_COLOR_BUFFER
 
 // template delete
 template <typename _Data>
@@ -72,3 +72,7 @@ inline void safe_delete_destroy(_Data& d)
 #define HR(x) (x)
 #endif
 #endif
+
+//Func
+char* ConvertWCtoC(wchar_t* _str);
+wchar_t* ConvertCtoWC(char* _str);

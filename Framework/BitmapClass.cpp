@@ -17,7 +17,7 @@ BitmapClass::~BitmapClass()
 {
 }
 
-bool BitmapClass::Init(ID3D11Device* _device, int _screenWidth, int _screenHeight, WCHAR* _textureFilename,
+bool BitmapClass::Init(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, int _screenWidth, int _screenHeight, WCHAR* _textureFilename,
 	int _bitmapWidth, int _bitmapHeight)
 {
 	m_screenWidth = _screenWidth;
@@ -34,7 +34,7 @@ bool BitmapClass::Init(ID3D11Device* _device, int _screenWidth, int _screenHeigh
 		return false;
 	}
 
-	if (!LoadTexture(_device, _textureFilename))
+	if (!LoadTexture(_device, _deviceContext, _textureFilename))
 	{
 		return false;
 	}
@@ -159,6 +159,7 @@ void BitmapClass::DestroyBuffers()
 
 bool BitmapClass::UpdateBuffers(ID3D11DeviceContext* _deviceContext, int _positionX, int _positionY)
 {
+	HRESULT result;
 	float left, right, top, bottom;
 	VertexType* vertices;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -237,7 +238,7 @@ void BitmapClass::RenderBuffers(ID3D11DeviceContext* _deviceContext)
 	return;
 }
 
-bool BitmapClass::LoadTexture(ID3D11Device* _device, WCHAR* _filename)
+bool BitmapClass::LoadTexture(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, WCHAR* _filename)
 {
 	m_Texture = new TextureClass;
 	if (!m_Texture)
@@ -245,10 +246,10 @@ bool BitmapClass::LoadTexture(ID3D11Device* _device, WCHAR* _filename)
 		return false;
 	}
 
-	/*if (!m_Texture->Init(_device, _filename))
+	if (!m_Texture->Init(_device, _deviceContext, ConvertWCtoC(_filename)))
 	{
 		return false;
-	}*/
+	}
 	return true;
 }
 

@@ -59,7 +59,7 @@ bool ColorShaderClass::InitShader(ID3D11Device* _device, HWND _hWnd, WCHAR* _vsF
 	D3D11_BUFFER_DESC matrixBufferDesc;
 
 	result = D3DCompileFromFile(_vsFilename, NULL, NULL, "ColorVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0,
-		&vertexShaderBuffer, &errorMessage)
+		&vertexShaderBuffer, &errorMessage);
 	if (FAILED(result))
 	{
 		if (errorMessage)
