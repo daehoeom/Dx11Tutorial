@@ -1,6 +1,10 @@
 #include "D3DClass.h"
 
-
+#ifndef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
 
 D3DClass::D3DClass()
 	: m_device(NULL),

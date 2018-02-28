@@ -1,5 +1,10 @@
 #include "CameraClass.h"
 
+#ifndef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
 
 CameraClass::CameraClass()
 	: m_posX(0.f), 

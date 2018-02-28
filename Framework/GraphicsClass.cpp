@@ -1,6 +1,10 @@
 #include "GraphicsClass.h"
 
-
+#ifndef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
 
 GraphicsClass::GraphicsClass()
 	: m_Direct3D(NULL),
@@ -82,6 +86,31 @@ bool GraphicsClass::Init(int _screenWidth, int _screenHeight, HWND _hWnd)
 		MessageBox(_hWnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
 	}
 
+	m_TextureShader = new TextureShaderClass;
+	if (!m_TextureShader)
+	{
+		return false;
+	}
+
+	if (!m_TextureShader->Init(m_Direct3D->GetDevice(), _hWnd))
+	{
+		MessageBox(_hWnd, L"Could not initialize the texture shader object.", L"Error", MB_OK);
+		return false;
+	}
+
+	m_Bitmap = new BitmapClass;
+	if (!m_Bitmap)
+	{
+		return false;
+	}
+
+	if (!m_Bitmap->Init(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), _screenWidth, _screenHeight, 
+		L"../Texture/stone02.tga", 256, 256))
+	{
+		MessageBox(_hWnd, L"Could not initialize the bitmap object.", L"Error", MB_OK);
+		return false;
+	}
+
 	m_Light = new LightClass;
 	if (!m_Light)
 	{
@@ -99,6 +128,8 @@ bool GraphicsClass::Init(int _screenWidth, int _screenHeight, HWND _hWnd)
 
 void GraphicsClass::Destroy()
 {
+	safe_delete_destroy(m_Bitmap);
+	safe_delete_destroy(m_TextureShader);
 	safe_delete(m_Light);
 	safe_delete_destroy(m_LightShader);
 	safe_delete_destroy(m_Model);
@@ -128,7 +159,7 @@ bool GraphicsClass::Frame()
 
 bool GraphicsClass::Render(float _rotation)
 {
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	XMMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
 
 	m_Direct3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -149,6 +180,22 @@ bool GraphicsClass::Render(float _rotation)
 		return false;
 	}
 
+	m_Direct3D->GetOrthoMatrix(orthoMatrix);
+
+	m_Direct3D->TurnZBufferOff();
+
+	if (!m_Bitmap->Render(m_Direct3D->GetDeviceContext(), 100, 100))
+	{
+		return false;
+	}
+
+	if (!m_TextureShader->Render(m_Direct3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix, m_Bitmap->GetTexture()))
+	{
+		return false;
+	}
+
+	m_Direct3D->TurnZBufferOn();
+	
 	m_Direct3D->EndScene();
 
 	return true;

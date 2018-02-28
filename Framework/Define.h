@@ -3,6 +3,7 @@
 #include <Windows.h>
 // singleton include list
 #include "CameraClass.h"
+#include <memory>
 
 // template delete
 template <typename _Data>
@@ -30,7 +31,7 @@ inline void safe_delete_array(_Data& d)
 {
 	if (d)
 	{
-		delete[](d);
+		delete [] (d);
 		(d) = nullptr;
 	}
 }

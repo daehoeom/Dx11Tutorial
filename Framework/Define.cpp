@@ -1,5 +1,11 @@
 #include "Define.h"
 
+#ifndef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
 // wchar_t to char
 char* ConvertWCtoC(wchar_t* _str)
 {

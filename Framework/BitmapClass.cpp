@@ -1,5 +1,10 @@
 #include "BitmapClass.h"
 
+#ifndef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
 
 
 BitmapClass::BitmapClass()
@@ -197,7 +202,7 @@ bool BitmapClass::UpdateBuffers(ID3D11DeviceContext* _deviceContext, int _positi
 	vertices[3].position = XMFLOAT3(left, top, 0.0f);
 	vertices[3].texture = XMFLOAT2(0.0f, 0.0f);
 
-	vertices[4].position = XMFLOAT3(right, bottom, 0.0f);
+	vertices[4].position = XMFLOAT3(right, top, 0.0f);
 	vertices[4].texture = XMFLOAT2(1.0f, 0.0f);
 
 	vertices[5].position = XMFLOAT3(right, bottom, 0.0f);
@@ -240,16 +245,21 @@ void BitmapClass::RenderBuffers(ID3D11DeviceContext* _deviceContext)
 
 bool BitmapClass::LoadTexture(ID3D11Device* _device, ID3D11DeviceContext* _deviceContext, WCHAR* _filename)
 {
+	char* tmpFilename = ConvertWCtoC(_filename);
+
 	m_Texture = new TextureClass;
 	if (!m_Texture)
 	{
 		return false;
 	}
 
-	if (!m_Texture->Init(_device, _deviceContext, ConvertWCtoC(_filename)))
+	if (!m_Texture->Init(_device, _deviceContext, tmpFilename))	// ConvertWCtoC(_filename)
 	{
 		return false;
 	}
+
+	delete [] tmpFilename;
+
 	return true;
 }
 

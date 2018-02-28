@@ -1,6 +1,10 @@
 #include "ModelClass.h"
 
-
+#ifndef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
 
 ModelClass::ModelClass()
 	: m_vertexBuffer(NULL),
@@ -202,7 +206,7 @@ bool ModelClass::LoadModel(char* filename)
 
 	m_indexCount = m_vertexCount;
 
-	m_model = new ModelType[m_vertexCount];
+	m_model = new ModelType[m_vertexCount];		//warning memory lick
 	if (!m_model)
 	{
 		return false;
